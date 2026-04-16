@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}TIMI{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-screen">
+    <!-- TIMI Logo/Title -->
+    <div class="w-48 h-48 rounded-full bg-red-600 flex items-center justify-center mb-12">
+        <h1 class="text-6xl font-black text-white tracking-wider">
+            TIMY
+        </h1>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4">
+        <a href="{% url 'users:register' %}" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-full transition text-center">
+            Sign Up
+        </a>
+        <a href="{% url 'users:login' %}" class="px-8 py-3 bg-transparent border-2 border-red-600/50 hover:bg-red-50 text-red-600 font-semibold rounded-full transition text-center">
+            Sign In
+        </a>
+    </div>
+</div>
+{% endblock %}

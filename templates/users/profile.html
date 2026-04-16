@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+    <!-- Header -->
+    <div class="mb-4 flex justify-between items-start">
+        <div>
+            <h1 class="text-3xl font-black text-red-600 mb-1">My Profile</h1>
+            <p class="text-gray-600 text-sm">Update your internship information</p>
+        </div>
+        <a href="{% url 'users:logout' %}" class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Logout">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-4 bg-red-50 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Personal Information</h2>
+        </div>
+        <form method="post" action="{% url 'users:update_profile' %}" class="p-4 space-y-3">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <label for="first_name" class="block text-xs font-medium text-gray-700 mb-1">First Name</label>
+                    <input 
+                        type="text" 
+                        name="first_name" 
+                        id="first_name"
+                        value="{{ user.first_name }}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-red-500 focus:border-red-500"
+                    >
+                </div>
+                <div>
+                    <label for="last_name" class="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
+                    <input 
+                        type="text" 
+                        name="last_name" 
+                        id="last_name"
+                        value="{{ user.last_name }}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-red-500 focus:border-red-500"
+                    >
+                </div>
+            </div>
+            <div>
+                <label for="email" class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    id="email"
+                    value="{{ user.email }}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-red-500 focus:border-red-500"
+                >
+            </div>
+            <div>
+                <p class="text-xs text-gray-600 mb-1">Role</p>
+                <p class="font-semibold text-gray-900 px-3 py-2 text-sm">{{ user.get_role_display }}</p>
+            </div>
+            
+            <!-- Save Button -->
+            <div class="flex gap-2 pt-2">
+                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded transition">
+                    Save Personal Info
+                </button>
+                <button type="reset" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold text-xs rounded transition">
+                    Reset
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Internship Profile Form -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-4 bg-red-50 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Internship Details</h2>
+        </div>
+        <form method="post" class="p-4 space-y-4">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- Course -->
+                <div>
+                    <label for="id_course" class="block text-xs font-medium text-gray-700 mb-1">Course</label>
+                    {{ form.course }}
+                    {% if form.course.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.course.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Company -->
+                <div>
+                    <label for="id_company" class="block text-xs font-medium text-gray-700 mb-1">Company</label>
+                    {{ form.company }}
+                    {% if form.company.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.company.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Department -->
+                <div>
+                    <label for="id_department" class="block text-xs font-medium text-gray-700 mb-1">Department</label>
+                    {{ form.department }}
+                    {% if form.department.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.department.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Required Hours -->
+                <div>
+                    <label for="id_required_hours" class="block text-xs font-medium text-gray-700 mb-1">Required Hours</label>
+                    {{ form.required_hours }}
+                    {% if form.required_hours.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.required_hours.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Start Date -->
+                <div>
+                    <label for="id_start_date" class="block text-xs font-medium text-gray-700 mb-1">Start Date</label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.start_date.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- End Date -->
+                <div>
+                    <label for="id_end_date" class="block text-xs font-medium text-gray-700 mb-1">End Date</label>
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.end_date.errors }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex gap-2">
+                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded transition">
+                    Save Changes
+                </button>
+                <a href="{% url 'dashboard' %}" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold text-xs rounded transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Weekly Schedule -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-3 bg-red-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Weekly Schedule</h2>
+            <p class="text-xs text-gray-600 mt-1">Set your working hours for each day of the week</p>
+        </div>
+        <form method="post" action="{% url 'users:update_schedule_bulk' %}" class="p-3">
+            {% csrf_token %}
+            <div class="space-y-2">
+                {% for day, day_schedule in schedule.items %}
+                <div class="flex items-center justify-between p-2 border border-gray-200 rounded hover:bg-gray-50">
+                    <div class="flex-1">
+                        <label class="flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                name="is_working_day_{{ day }}" 
+                                value="on"
+                                {% if day_schedule.is_working_day %}checked{% endif %}
+                                class="h-4 w-4 rounded"
+                                onchange="document.getElementById('time-fields-{{ day }}').style.display = this.checked ? 'flex' : 'none'"
+                            >
+                            <span class="ml-2 font-semibold text-gray-900 capitalize text-xs">{{ day }}</span>
+                        </label>
+                    </div>
+
+                    <div id="time-fields-{{ day }}" class="flex items-center gap-2 flex-1 ml-4" style="display: {% if day_schedule.is_working_day %}flex{% else %}none{% endif %};">
+                        <div class="flex items-center gap-1">
+                            <label for="start_time_{{ day }}" class="text-xs text-gray-600">From:</label>
+                            <input 
+                                type="time" 
+                                name="start_time_{{ day }}" 
+                                id="start_time_{{ day }}"
+                                value="{% if day_schedule.start_time %}{{ day_schedule.start_time|time:'H:i' }}{% endif %}"
+                                class="p-1 border border-gray-300 rounded text-xs"
+                            >
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <label for="end_time_{{ day }}" class="text-xs text-gray-600">To:</label>
+                            <input 
+                                type="time" 
+                                name="end_time_{{ day }}" 
+                                id="end_time_{{ day }}"
+                                value="{% if day_schedule.end_time %}{{ day_schedule.end_time|time:'H:i' }}{% endif %}"
+                                class="p-1 border border-gray-300 rounded text-xs"
+                            >
+                        </div>
+                    </div>
+                    {% if not day_schedule.is_working_day %}
+                    <span class="text-gray-500 text-xs">Off</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Save Button -->
+            <div class="mt-3 flex gap-2">
+                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded transition">
+                    Save Schedule
+                </button>
+                <a href="{% url 'dashboard' %}" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold text-xs rounded transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

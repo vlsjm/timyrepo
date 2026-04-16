@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Report - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-2xl">
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-6">
+        <div>
+            <h1 class="text-4xl font-black text-red-600 mb-2">{{ report.get_report_type_display }}</h1>
+            <p class="text-gray-600 text-lg">{{ report.start_date }} to {{ report.end_date }}</p>
+        </div>
+        <a href="{% url 'reports:dashboard' %}" class="text-blue-600 hover:text-blue-700 font-semibold">← Back</a>
+    </div>
+
+    <!-- Report Info -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+                <p class="text-gray-600 text-sm">Report Type</p>
+                <p class="font-semibold text-gray-900 mt-1">{{ report.get_report_type_display }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600 text-sm">Format</p>
+                <p class="font-semibold text-gray-900 mt-1">{{ report.get_format_display }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600 text-sm">Generated</p>
+                <p class="font-semibold text-gray-900 mt-1">{{ report.created_at|date:"M d, Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Section -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="font-semibold text-blue-900 mb-4"><i class="fas fa-download text-blue-900"></i> Download Report</h3>
+        <p class="text-blue-800 mb-4">Click the button below to download your report file</p>
+        <a href="{{ report.file_path.url }}" download class="inline-block px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">
+            Download {{ report.get_format_display }}
+        </a>
+    </div>
+
+    <!-- Back Link -->
+    <a href="{% url 'reports:dashboard' %}" class="text-blue-600 hover:text-blue-700 font-semibold">
+        ← Back to Reports
+    </a>
+</div>
+{% endblock %}

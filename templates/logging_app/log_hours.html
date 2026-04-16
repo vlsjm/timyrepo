@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Log{% endif %} Hours - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-4 max-w-2xl">
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="text-3xl font-black text-red-600 mb-1">
+            {% if is_edit %}Edit Log{% else %}Log Hours{% endif %}
+        </h1>
+        <p class="text-gray-600 mt-1 text-sm">
+            {% if is_edit %}Update your work log entry{% else %}Record your daily work hours{% endif %}
+        </p>
+    </div>
+
+    <!-- Form -->
+    <form method="post" class="bg-white rounded-lg shadow p-4 space-y-4">
+        {% csrf_token %}
+
+        <!-- Date -->
+        <div>
+            <label for="id_date" class="block text-xs font-medium text-gray-700 mb-1">Date</label>
+            {{ form.date }}
+            {% if form.date.errors %}
+            <p class="text-red-600 text-xs mt-1">{{ form.date.errors }}</p>
+            {% endif %}
+            <p class="text-gray-600 text-xs mt-1">Select the date you worked</p>
+        </div>
+
+        <!-- Logging Mode Selection -->
+        <div class="border-t border-gray-200 pt-4">
+            <label class="block text-xs font-medium text-gray-700 mb-2">Logging Mode</label>
+            <div class="space-y-2">
+                {% for value, label in form.logging_mode.field.choices %}
+                <label class="flex items-center gap-3 p-3 border border-gray-200 rounded hover:bg-red-50 cursor-pointer transition mode-option" data-mode="{{ value }}">
+                    <input type="radio" name="logging_mode" value="{{ value }}" {% if form.logging_mode.value == value %}checked{% endif %} class="w-4 h-4 mode-radio">
+                    <div>
+                        <span class="text-xs font-medium text-gray-700 block">{{ label }}</span>
+                        {% if value == 'single' %}
+                        <span class="text-xs text-gray-500">Log once with automatic 1-hour break deduction</span>
+                        {% else %}
+                        <span class="text-xs text-gray-500">Log morning and afternoon shifts separately</span>
+                        {% endif %}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+            {% if form.logging_mode.errors %}
+            <p class="text-red-600 text-xs mt-1">{{ form.logging_mode.errors }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Single Period Mode -->
+        <div id="single-mode" class="border-t border-gray-200 pt-4 hidden">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Work Hours</h3>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Time In -->
+                <div>
+                    <label for="id_time_in" class="block text-xs font-medium text-gray-700 mb-1">Time In</label>
+                    {{ form.time_in }}
+                    {% if form.time_in.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.time_in.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Time Out -->
+                <div>
+                    <label for="id_time_out" class="block text-xs font-medium text-gray-700 mb-1">Time Out</label>
+                    {{ form.time_out }}
+                    {% if form.time_out.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.time_out.errors }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+           
+        </div>
+
+        <!-- Split Shift Mode -->
+        <div id="split-mode" class="border-t border-gray-200 pt-4 hidden">
+            <!-- Morning Shift -->
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">Morning Shift</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Morning Time In -->
+                    <div>
+                        <label for="id_time_in" class="block text-xs font-medium text-gray-700 mb-1">Time In</label>
+                        {{ form.time_in }}
+                        {% if form.time_in.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.time_in.errors }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Morning Time Out -->
+                    <div>
+                        <label for="id_time_out" class="block text-xs font-medium text-gray-700 mb-1">Time Out</label>
+                        {{ form.time_out }}
+                        {% if form.time_out.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.time_out.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Afternoon Shift (Optional) -->
+            <div class="mb-4 pb-4 border-b border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">Afternoon Shift <span class="text-gray-500 text-xs font-normal">(Optional)</span></h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Afternoon Time In -->
+                    <div>
+                        <label for="id_time_in_afternoon" class="block text-xs font-medium text-gray-700 mb-1">Time In</label>
+                        {{ form.time_in_afternoon }}
+                        {% if form.time_in_afternoon.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.time_in_afternoon.errors }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Afternoon Time Out -->
+                    <div>
+                        <label for="id_time_out_afternoon" class="block text-xs font-medium text-gray-700 mb-1">Time Out</label>
+                        {{ form.time_out_afternoon }}
+                        {% if form.time_out_afternoon.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.time_out_afternoon.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Description -->
+        <div class="border-t border-gray-200 pt-4">
+            <label for="id_description" class="block text-xs font-medium text-gray-700 mb-1">Task Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <p class="text-red-600 text-xs mt-1">{{ form.description.errors }}</p>
+            {% endif %}
+            
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2 pt-3">
+            <button type="submit" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded transition">
+                {% if is_edit %}Update Log{% else %}Log Hours{% endif %}
+            </button>
+            <a href="{% url 'logging_app:logs' %}" class="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold text-sm rounded transition text-center">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+    <!-- JavaScript to handle mode switching -->
+    <script>
+        function updateLoggingMode() {
+            const selectedMode = document.querySelector('input[name="logging_mode"]:checked').value;
+            const singleMode = document.getElementById('single-mode');
+            const splitMode = document.getElementById('split-mode');
+            
+            if (selectedMode === 'single') {
+                // Show single mode, hide split mode
+                singleMode.classList.remove('hidden');
+                splitMode.classList.add('hidden');
+                
+                // Enable single mode inputs, disable split mode inputs
+                singleMode.querySelectorAll('input, textarea, select').forEach(el => {
+                    el.disabled = false;
+                });
+                splitMode.querySelectorAll('input, textarea, select').forEach(el => {
+                    el.disabled = true;
+                });
+            } else {
+                // Show split mode, hide single mode
+                singleMode.classList.add('hidden');
+                splitMode.classList.remove('hidden');
+                
+                // Disable single mode inputs, enable split mode inputs
+                singleMode.querySelectorAll('input, textarea, select').forEach(el => {
+                    el.disabled = true;
+                });
+                splitMode.querySelectorAll('input, textarea, select').forEach(el => {
+                    el.disabled = false;
+                });
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLoggingMode();
+            
+            // Add event listeners to radio buttons
+            document.querySelectorAll('input[name="logging_mode"]').forEach(radio => {
+                radio.addEventListener('change', updateLoggingMode);
+            });
+        });
+    </script>
+
+  
+</div>
+{% endblock %}

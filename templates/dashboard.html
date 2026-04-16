@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="text-left">
+        <p class="text-gray-900 text-lg font-semibold">Hello, {{ user.first_name }}</p>
+        <h1 class="text-4xl font-bold text-red-600 mt-1">{{ greeting }}</h1>
+        {% if alert_message %}
+        <p class="text-sm font-medium mt-2 {% if alert_status == 'ahead' %}text-green-600{% elif alert_status == 'on_track' %}text-blue-600{% elif alert_status == 'behind' %}text-orange-600{% elif alert_status == 'overdue' %}text-red-600{% else %}text-gray-600{% endif %}">{{ alert_message }}</p>
+        {% endif %}
+    </div>
+
+    {% if user.is_intern %}
+    <!-- Intern Dashboard -->
+    {% if profile %}
+    
+    <!-- Progress Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-1 gap-2">
+        <!-- Remaining Hours Card -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-600 text-xs font-medium">Remaining Hours</p>
+                    <p class="text-2xl font-bold text-orange-600 mt-1">{{ remaining_hours }}</p>
+                </div>
+                <div class="text-2xl"><i class="fas fa-bullseye text-orange-600"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Days Overview -->
+    <div class="grid grid-cols-2 gap-2">
+        <!-- Days Remaining Card -->
+        {% if days_remaining is not None %}
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-600 text-xs font-medium">Working Days Remaining</p>
+                    <p class="text-2xl font-bold {% if is_overdue %}text-red-600{% elif working_days_remaining < 5 %}text-orange-600{% else %}text-green-600{% endif %} mt-1">
+                        {% if is_overdue %}{{ days_overdue }} ago{% else %}{{ working_days_remaining }}{% endif %}
+                    </p>
+                    <p class="text-gray-500 text-xs mt-0.5">{{ end_date_formatted }}</p>
+                </div>
+                <div class="text-2xl"><i class="fas fa-calendar text-blue-600"></i></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Logging Streak Card -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-600 text-xs font-medium">Days Logged</p>
+                    <p class="text-2xl font-bold text-purple-600 mt-1">{{ total_unique_logged_days }}</p>
+                </div>
+                <div class="text-2xl"><i class="fas fa-fire text-purple-600"></i></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Progress Score Card (Styled like image) -->
+    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg shadow-lg p-8 relative overflow-hidden">
+        <!-- Decorative background element -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
+        
+        <div class="flex items-center justify-between relative z-10">
+            <!-- Left content -->
+            <div>
+                <h3 class="text-white text-base font-semibold mb-2">Progress</h3>
+                <p class="text-red-50 text-base font-medium">{{ completed_hours }}/{{ profile.required_hours }} hours completed</p>
+            </div>
+            
+            <!-- Right circular progress -->
+            <div class="relative w-24 h-24 flex items-center justify-center">
+                <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                    <!-- Background circle -->
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="8"/>
+                    <!-- Progress circle -->
+                    <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="45" 
+                        fill="none" 
+                        stroke="rgba(255,255,255,0.9)" 
+                        stroke-width="8"
+                        stroke-dasharray="{{ stroke_dasharray }} 282.7"
+                        stroke-linecap="round"
+                        style="transition: stroke-dasharray 0.5s ease;"
+                    />
+                </svg>
+                <!-- Percentage text -->
+                <div class="absolute flex flex-col items-center">
+                    <span class="text-4xl font-bold text-white">{{ progress_percentage|floatformat:0 }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Context Card -->
+    <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-base font-semibold text-gray-900 mb-2">Internship Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+                <p class="text-gray-600 text-xs font-medium">Company</p>
+                <p class="text-gray-900 text-sm font-semibold mt-0.5">{{ profile.company }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600 text-xs font-medium">Department</p>
+                <p class="text-gray-900 text-sm font-semibold mt-0.5">{{ profile.department|default:"Not specified" }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600 text-xs font-medium">Course</p>
+                <p class="text-gray-900 text-sm font-semibold mt-0.5">{{ profile.course }}</p>
+            </div>
+            <div>
+                <p class="text-gray-600 text-xs font-medium">Required Hours</p>
+                <p class="text-gray-900 text-sm font-semibold mt-0.5">{{ profile.required_hours }} hours</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Breakdown Card -->
+    <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-base font-semibold text-gray-900 mb-3">This Week's Hours</h3>
+        <div class="grid grid-cols-7 gap-1">
+            {% for day, hours in weekly_breakdown.items %}
+            <div class="text-center">
+                <p class="text-gray-600 text-xs font-medium mb-1">{{ day }}</p>
+                <div class="bg-blue-100 rounded-lg p-2 min-h-10 flex items-center justify-center">
+                    <p class="text-sm font-bold text-blue-600">{{ hours|floatformat:1 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Logs -->
+    {% if recent_logs %}
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Recent Logs</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+            {% for log in recent_logs %}
+            <a href="{% url 'logging_app:log_detail' log.pk %}" class="block p-6 hover:bg-gray-50 transition">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ log.date }}</p>
+                        <p class="text-gray-600 text-sm">{{ log.time_in }} - {{ log.time_out }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-blue-600">{{ log.total_hours }}h</p>
+                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded
+                            {% if log.status == 'approved' %}bg-green-100 text-green-800
+                            {% elif log.status == 'submitted' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ log.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <p class="text-gray-600 text-sm">{{ log.description|truncatewords:15 }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="p-6 bg-gray-50 text-center border-t border-gray-200">
+            <a href="{% url 'logging_app:logs' %}" class="text-blue-600 hover:text-blue-700 font-semibold">
+                View All Logs →
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+        <p class="text-blue-900">No logs yet. <a href="{% url 'logging_app:log_hours' %}" class="font-semibold hover:underline">Start logging hours</a></p>
+    </div>
+    {% endif %}
+    {% else %}
+    <!-- No profile set up -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+        <p class="text-yellow-900">Please complete your profile setup to view your dashboard</p>
+    </div>
+    {% endif %}
+
+    {% elif user.is_supervisor %}
+    <!-- Supervisor Dashboard -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="text-center">
+            <p class="text-3xl mb-4"><i class="fas fa-users text-blue-600"></i></p>
+            <h2 class="text-2xl font-bold text-gray-900">Supervisor Dashboard</h2>
+            <p class="text-gray-600 mt-2">Features coming soon...</p>
+            <p class="text-gray-600 text-sm mt-4">
+                As a supervisor, you'll be able to review and approve intern hour logs.
+            </p>
+        </div>
+    </div>
+
+    {% elif user.is_admin %}
+    <!-- Admin Dashboard -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="text-center">
+            <p class="text-3xl mb-4"><i class="fas fa-gear text-gray-600"></i></p>
+            <h2 class="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+            <p class="text-gray-600 mt-2">Manage system users and settings</p>
+            <a href="/admin/" class="inline-block mt-4 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                Go to Admin Panel
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

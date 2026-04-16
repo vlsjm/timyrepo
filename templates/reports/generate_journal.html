@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Journal Report - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Generate Journal Report</h1>
+        <p class="text-gray-600 mt-2">Create a PDF or CSV report of your daily task descriptions and journal entries</p>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form method="post" id="journalForm" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Filter Mode Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-4">Select Report Type</label>
+                <div class="space-y-4">
+                    <!-- Single Day -->
+                    <label class="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" name="filter_mode" value="single_day" checked class="w-4 h-4 text-blue-600 mt-1">
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">Single Day Journal</p>
+                            <p class="text-sm text-gray-600">Generate journal entry for one specific day</p>
+                        </div>
+                    </label>
+
+                    <!-- Month -->
+                    <label class="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" name="filter_mode" value="month" class="w-4 h-4 text-blue-600 mt-1">
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">Monthly Journal</p>
+                            <p class="text-sm text-gray-600">Generate journal for an entire month</p>
+                        </div>
+                    </label>
+
+                    <!-- Date Range -->
+                    <label class="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" name="filter_mode" value="range" class="w-4 h-4 text-blue-600 mt-1">
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">Custom Date Range</p>
+                            <p class="text-sm text-gray-600">Generate journal for a specific date range</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Filter Options -->
+            <div class="bg-gray-50 rounded-lg p-6 space-y-6">
+                <!-- Single Day Options -->
+                <div id="singleDayOptions" class="space-y-4">
+                    <div>
+                        <label for="single_date" class="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                        <input type="date" name="single_date" id="single_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                    </div>
+                </div>
+
+                <!-- Month Options -->
+                <div id="monthOptions" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label for="month" class="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                            <select name="month" id="month" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                                {% for month_num, month_name in months %}
+                                    <option value="{{ month_num }}" {% if month_num == current_month %}selected{% endif %}>
+                                        {{ month_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="year" class="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                            <select name="year" id="year" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                                {% for year in years %}
+                                    <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>
+                                        {{ year }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date Range Options -->
+                <div id="rangeOptions" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label for="range_start" class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                            <input type="date" name="range_start" id="range_start" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div>
+                            <label for="range_end" class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                            <input type="date" name="range_end" id="range_end" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Format Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Export Format</label>
+                <div class="space-y-3">
+                    <label class="flex items-center">
+                        <input type="radio" name="format" value="pdf" checked class="w-4 h-4 text-blue-600">
+                        <span class="ml-3 text-gray-700"><strong>PDF</strong> (Professional document format - recommended)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="format" value="csv" class="w-4 h-4 text-blue-600">
+                        <span class="ml-3 text-gray-700">CSV (Spreadsheet - Excel compatible)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-sm text-blue-800">
+                    <strong>Note:</strong> Your journal report includes all your task descriptions and time entries for the selected period. 
+                    PDF format is recommended for printing and professional use. CSV format is great for spreadsheet analysis.
+                </p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 font-semibold transition">
+                    <i class="fas fa-download mr-2"></i>Generate Journal
+                </button>
+                <a href="{% url 'reports:dashboard' %}" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 font-semibold transition text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Example Info -->
+    <div class="mt-8 bg-gray-50 rounded-lg p-6">
+        <h3 class="font-semibold text-gray-900 mb-3">Journal Report Includes:</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Your name, department, and position</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Date, day of week, and time entries for each logged day</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Complete task descriptions for each day</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Total hours logged for the period</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Professional formatting for presentations or records</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // Handle filter mode changes
+    const filterModeRadios = document.querySelectorAll('input[name="filter_mode"]');
+    const singleDayOptions = document.getElementById('singleDayOptions');
+    const monthOptions = document.getElementById('monthOptions');
+    const rangeOptions = document.getElementById('rangeOptions');
+    const journalForm = document.getElementById('journalForm');
+
+    function updateFilterOptions() {
+        const selectedMode = document.querySelector('input[name="filter_mode"]:checked').value;
+        
+        singleDayOptions.classList.add('hidden');
+        monthOptions.classList.add('hidden');
+        rangeOptions.classList.add('hidden');
+        
+        if (selectedMode === 'single_day') {
+            singleDayOptions.classList.remove('hidden');
+        } else if (selectedMode === 'month') {
+            monthOptions.classList.remove('hidden');
+        } else if (selectedMode === 'range') {
+            rangeOptions.classList.remove('hidden');
+        }
+    }
+
+    filterModeRadios.forEach(radio => {
+        radio.addEventListener('change', updateFilterOptions);
+    });
+
+    // Form validation on submit
+    journalForm.addEventListener('submit', function(e) {
+        const selectedMode = document.querySelector('input[name="filter_mode"]:checked').value;
+        
+        // Validate based on selected filter mode
+        if (selectedMode === 'single_day') {
+            const singleDate = document.getElementById('single_date').value;
+            if (!singleDate) {
+                e.preventDefault();
+                alert('Please select a date for the single day journal.');
+                return false;
+            }
+        } else if (selectedMode === 'month') {
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+            if (!month || !year) {
+                e.preventDefault();
+                alert('Please select both month and year.');
+                return false;
+            }
+        } else if (selectedMode === 'range') {
+            const rangeStart = document.getElementById('range_start').value;
+            const rangeEnd = document.getElementById('range_end').value;
+            if (!rangeStart || !rangeEnd) {
+                e.preventDefault();
+                alert('Please select both start and end dates.');
+                return false;
+            }
+            if (new Date(rangeStart) > new Date(rangeEnd)) {
+                e.preventDefault();
+                alert('Start date must be before end date.');
+                return false;
+            }
+        }
+    });
+
+    // Initial setup
+    updateFilterOptions();
+</script>
+{% endblock %}

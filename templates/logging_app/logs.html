@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}My Logs - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-3">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-black text-red-600 mb-2">My Logs</h1>
+        <p class="text-gray-600 text-lg">Monthly hour entries</p>
+    </div>
+
+    <!-- Month Navigation -->
+    <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex justify-between items-center mb-2">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900">
+                    {{ month_start|date:"F Y" }}
+                </h2>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex gap-2">
+                <a href="?month={{ prev_month }}" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold rounded text-sm transition">
+                    ← Prev
+                </a>
+                <a href="?month={{ month_start|date:'Y-m-d' }}" class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-900 font-semibold rounded text-sm transition">
+                    Today
+                </a>
+                <a href="?month={{ next_month }}" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold rounded text-sm transition">
+                    Next →
+                </a>
+            </div>
+        </div>
+
+        <!-- Month Selector Dropdown -->
+        <div class="mt-2">
+            <select onchange="window.location.href='?month=' + this.value" class="w-full px-2 py-1 text-sm border border-gray-300 rounded">
+                <option value="">Select month...</option>
+                {% for month in all_months %}
+                <option value="{{ month|date:'Y-m-d' }}" {% if month == current_month %}selected{% endif %}>
+                    {{ month|date:"F Y" }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Monthly Stats -->
+    <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-lg shadow p-3">
+            <p class="text-gray-600 text-xs">This Month Hours</p>
+            <p class="text-xl font-bold text-red-600">{{ monthly_hours }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-3">
+            <p class="text-gray-600 text-xs">Total Entries</p>
+            <p class="text-xl font-bold text-purple-600">{{ first_half_logs.count|add:second_half_logs.count }}</p>
+        </div>
+    </div>
+
+    <!-- Days 1-15 Table -->
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+        <div class="p-2 bg-gray-50 border-b border-gray-200">
+            <h3 class="font-semibold text-gray-900 text-sm">Days 1-15</h3>
+        </div>
+        <table class="w-full text-xs">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-2 py-2 text-left font-semibold text-gray-700">Day</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">In</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Out</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">In</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Out</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Hrs</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Act</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for log in first_half_logs %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-2 py-2 font-medium text-gray-900">{{ log.date.day }}</td>
+                    <td class="px-1 py-2 text-center text-gray-600"><span class="text-xs">{{ log.time_in }}</span></td>
+                    <td class="px-1 py-2 text-center text-gray-600"><span class="text-xs">{{ log.time_out }}</span></td>
+                    <td class="px-1 py-2 text-center text-gray-600">
+                        {% if log.time_in_afternoon %}<span class="text-xs">{{ log.time_in_afternoon }}</span>{% endif %}
+                    </td>
+                    <td class="px-1 py-2 text-center text-gray-600">
+                        {% if log.time_out_afternoon %}<span class="text-xs">{{ log.time_out_afternoon }}</span>{% endif %}
+                    </td>
+                    <td class="px-1 py-2 text-center font-bold text-red-600">{{ log.total_hours }}</td>
+                    <td class="px-1 py-2 text-center">
+                        <a href="{% url 'logging_app:log_detail' log.pk %}" class="text-red-600 hover:text-red-700 text-xs">✎</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="px-2 py-3 text-center text-gray-500 text-xs">No entries</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Days 16-31 Table -->
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+        <div class="p-2 bg-gray-50 border-b border-gray-200">
+            <h3 class="font-semibold text-gray-900 text-sm">Days 16-31</h3>
+        </div>
+        <table class="w-full text-xs">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-2 py-2 text-left font-semibold text-gray-700">Day</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">In</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Out</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">In</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Out</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Hrs</th>
+                    <th class="px-1 py-2 text-center font-semibold text-gray-700">Act</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for log in second_half_logs %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-2 py-2 font-medium text-gray-900">{{ log.date.day }}</td>
+                    <td class="px-1 py-2 text-center text-gray-600"><span class="text-xs">{{ log.time_in }}</span></td>
+                    <td class="px-1 py-2 text-center text-gray-600"><span class="text-xs">{{ log.time_out }}</span></td>
+                    <td class="px-1 py-2 text-center text-gray-600">
+                        {% if log.time_in_afternoon %}<span class="text-xs">{{ log.time_in_afternoon }}</span>{% endif %}
+                    </td>
+                    <td class="px-1 py-2 text-center text-gray-600">
+                        {% if log.time_out_afternoon %}<span class="text-xs">{{ log.time_out_afternoon }}</span>{% endif %}
+                    </td>
+                    <td class="px-1 py-2 text-center font-bold text-red-600">{{ log.total_hours }}</td>
+                    <td class="px-1 py-2 text-center">
+                        <a href="{% url 'logging_app:log_detail' log.pk %}" class="text-red-600 hover:text-red-700 text-xs">✎</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="px-2 py-3 text-center text-gray-500 text-xs">No entries</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

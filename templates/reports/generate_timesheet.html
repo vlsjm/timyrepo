@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Timesheet - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-black text-red-600 mb-2">Generate Timesheet</h1>
+        <p class="text-gray-600 text-lg">Create a monthly timesheet for printing or export</p>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Month and Year Selection -->
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label for="month" class="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                    <select name="month" id="month" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required>
+                        {% for month_num, month_name in months %}
+                            <option value="{{ month_num }}" {% if month_num == current_month %}selected{% endif %}>
+                                {{ month_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="year" class="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                    <select name="year" id="year" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required>
+                        {% for year in years %}
+                            <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>
+                                {{ year }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Format Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Export Format</label>
+                <div class="space-y-3">
+                    <label class="flex items-center">
+                        <input type="radio" name="format" value="pdf" checked class="w-4 h-4 text-blue-600">
+                        <span class="ml-3 text-gray-700"><strong>PDF</strong> (Professional document format)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="format" value="csv" class="w-4 h-4 text-blue-600">
+                        <span class="ml-3 text-gray-700">CSV (Excel/Spreadsheet)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-sm text-blue-800">
+                    <strong>Note:</strong> The timesheet will include all your logged hours for the selected month. 
+                    You can print it directly or export to CSV for further editing.
+                </p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 font-semibold transition">
+                    <i class="fas fa-download mr-2"></i>Generate Timesheet
+                </button>
+                <a href="{% url 'reports:dashboard' %}" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 font-semibold transition text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Example Info -->
+    <div class="mt-8 bg-gray-50 rounded-lg p-6">
+        <h3 class="font-semibold text-gray-900 mb-3">Timesheet Includes:</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+            <li><i class="fas fa-check text-green-600 mr-2"></i>All days of the selected month</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Time in, time out (morning & afternoon)</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Daily total hours</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Monthly total hours</li>
+            <li><i class="fas fa-check text-green-600 mr-2"></i>Signature lines for employee and supervisor</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

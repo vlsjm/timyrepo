@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Internship Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="text-3xl font-black text-red-600 mb-1">Reports</h1>
+        <p class="text-gray-600 text-sm">Generate and download your internship reports</p>
+    </div>
+
+    <!-- Report Generation Options -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- Timesheet -->
+        <a href="{% url 'reports:generate_timesheet' %}" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+            <div class="text-3xl mb-2"><i class="fas fa-calendar-alt text-green-600"></i></div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">Monthly Timesheet</h3>
+            <p class="text-gray-600 text-xs mb-3">Create a professional monthly timesheet for printing or export</p>
+            <div class="text-blue-600 font-semibold text-xs">Generate Timesheet →</div>
+        </a>
+
+        <!-- Journal Report -->
+        <a href="{% url 'reports:generate_journal' %}" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+            <div class="text-3xl mb-2"><i class="fas fa-book text-orange-600"></i></div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">Journal Report</h3>
+            <p class="text-gray-600 text-xs mb-3">Export your daily task descriptions and journal entries by day or month</p>
+            <div class="text-blue-600 font-semibold text-xs">Generate Journal →</div>
+        </a>
+    </div>
+
+    <!-- Previous Reports -->
+    {% if reports %}
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-4">
+            <h2 class="text-lg font-semibold text-gray-900">Your Reports</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+            {% for report in reports %}
+            <div class="p-4 flex justify-between items-center hover:bg-gray-50 transition">
+                <div>
+                    <h4 class="font-semibold text-gray-900 text-sm">{{ report.get_report_type_display }}</h4>
+                    <p class="text-gray-600 text-xs">
+                        {{ report.start_date }} to {{ report.end_date }} 
+                        <span class="text-xs bg-gray-100 px-2 py-1 rounded mx-1">{{ report.get_format_display }}</span>
+                    </p>
+                    <p class="text-gray-600 text-xs mt-1">Generated {{ report.created_at|date:"M d, Y" }}</p>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{% url 'reports:view_report' report.pk %}" class="px-3 py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
+                        Download
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+        <p class="text-gray-600 font-medium text-sm">No reports generated yet</p>
+        <p class="text-gray-600 text-xs mt-1">Create your first report using the options above</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
