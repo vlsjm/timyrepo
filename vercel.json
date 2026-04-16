@@ -1,8 +1,8 @@
 {
-  "buildCommand": "bash build.sh",
-  "outputDirectory": "staticfiles",
-  "framework": "django",
-  "python": {
-    "version": "3.12"
-  }
+    "buildCommand": "bash build.sh",
+    "outputDirectory": "staticfiles",
+    "framework": "django",
+    "python": {
+        "version": "3.12"
+    }
 }
