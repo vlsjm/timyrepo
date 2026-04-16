@@ -1,5 +1,4 @@
 {
-    "buildCommand": "bash build.sh",
-    "outputDirectory": "staticfiles",
-    "framework": "django"
+  "buildCommand": "bash build.sh",
+  "outputDirectory": "staticfiles"
 }
