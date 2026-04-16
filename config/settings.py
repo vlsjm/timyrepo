@@ -22,7 +22,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,kazuko-unwarpable-shemeka.ngrok-free.dev,timyrepo.vercel.app,timyrepo-oe6xcbtak-vlsjms-projects.vercel.app').split(',')]
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,kazuko-unwarpable-shemeka.ngrok-free.dev,timyrepo.vercel.app,timyrepo-oe6xcbtak-vlsjms-projects.vercel.app,timyrepo-f4v9xdgng-vlsjms-projects.vercel.app').split(',')]
 # Ensure ngrok domains are always included for development
 if not any(host.endswith('.ngrok-free.dev') or host.endswith('.ngrok-free.app') or host.endswith('.ngrok.io') for host in ALLOWED_HOSTS):
     ALLOWED_HOSTS.extend(['kazuko-unwarpable-shemeka.ngrok-free.dev'])
@@ -35,6 +35,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'timyrepo.vercel.app',
     'timyrepo-oe6xcbtak-vlsjms-projects.vercel.app',
+    'timyrepo-f4v9xdgng-vlsjms-projects.vercel.app',
     
 ]
 
